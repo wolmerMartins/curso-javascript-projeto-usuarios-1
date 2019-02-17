@@ -1,13 +1,14 @@
 class User {
-    constructor(name, gender, birth, country, email, password, photo, admin) {
-        this._name = name;
-        this._gender = gender;
-        this._birth = birth;
-        this._country = country;
-        this._email = email;
-        this._password = password;
-        this._photo = photo;
-        this._admin = admin;
+    constructor(dataUser) {
+        this._name = dataUser.name;
+        this._gender = dataUser.gender;
+        this._birth = dataUser.birth;
+        this._country = dataUser.country;
+        this._email = dataUser.email;
+        this._password = dataUser.password;
+        this._photo = dataUser.photo;
+        this._admin = dataUser.admin;
+        this._register = new Date();
     }
 
     get name() {
@@ -72,5 +73,13 @@ class User {
 
     set admin(admin) {
         this._admin = admin;
+    }
+
+    get register() {
+        return this._register;
+    }
+
+    set register(register) {
+        this._register = register;
     }
 }
