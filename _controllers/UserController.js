@@ -38,8 +38,9 @@ class UserController {
                         result._photo = content;
                     }
                     
-                    let user = new User(result);
+                    let user = new User();
                     user.loadFromJSON(result);
+                    user.save();
 
                     this.getTr(user, tr);
                     this.updateCount();
@@ -66,7 +67,7 @@ class UserController {
             this.getPhoto(this.formEl).then(
                 (content) => {
                     values.photo = content;
-                    this.insert(values);
+                    values.save();
                     this.addLine(values);
                     this.formEl.reset();
                     btn.disabled = false;
@@ -130,12 +131,24 @@ class UserController {
             return false;
         }
 
-        return new User(user);
+        return new User(
+            user.name,
+            user.gender,
+            user.birth,
+            user.country,
+            user.email,
+            user.password,
+            user.photo,
+            user.admin
+        );
     }
 
     addEventsTr(tr) {
         tr.querySelector(".btn-delete").addEventListener("click", e => {
             if (confirm("Deseja realmente excluir?")) {
+                let user = new User();
+                user.loadFromJSON(JSON.parse(tr.dataset.user));
+                user.remove();
                 tr.remove();
                 this.updateCount();
             }
@@ -168,33 +181,19 @@ class UserController {
         });
     }
 
-    getUsersStorage() {
-        let users = [];
-        if (localStorage.getItem("users")) {
-            users = JSON.parse(localStorage.getItem("users"));
-        }
-        return users;
-    }
-
     selectAll() {
-        let users = this.getUsersStorage();
+        let users = User.getUsersStorage();
         users.forEach(dataUser => {
-            let user = new User(dataUser);
+            let user = new User();
             user.loadFromJSON(dataUser);
             this.addLine(user);
         });
     }
 
-    insert(data) {
-        let users = this.getUsersStorage();
-        users.push(data);
-        //sessionStorage.setItem("users", JSON.stringify(users));
-        localStorage.setItem("users", JSON.stringify(users));
-    }
-
-    getTr(dataUser) {
-        let tr = document.createElement("tr");
-
+    getTr(dataUser, tr = null) {
+        if (tr == null) {
+            tr = document.createElement("tr");
+        }
         tr.dataset.user = JSON.stringify(dataUser);
         tr.innerHTML = `
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
